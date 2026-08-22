@@ -6,21 +6,13 @@
     <div v-else-if="error">{{ error }}</div>
 
     <div v-else>
-      <input
-        v-model="query"
-        class="search"
-        type="search"
-        placeholder="Search by name"
-      >
+      <UserSearch v-model="query" />
       <div class="users-list">
-        <div v-for="user in filteredUsers" :key="user.id" class="user-item">
-          <div class="user-name">{{ user.name }}</div>
-          <div class="user-email">{{ user.email }}</div>
-          <div class="user-meta">
-            <span class="badge">{{ user.role }}</span>
-            <span class="status" :class="user.status">{{ user.status }}</span>
-          </div>
-        </div>
+        <UserCard
+          v-for="user in filteredUsers"
+          :key="user.id"
+          :user="user"
+        />
       </div>
     </div>
   </div>
@@ -29,6 +21,8 @@
 <script setup>
 import { computed, ref, onMounted } from 'vue'
 import { fetchUsers } from './api/mock.js'
+import UserSearch from './components/UserSearch.vue'
+import UserCard from './components/UserCard.vue'
 
 const users = ref([])
 const isLoading = ref(false)
@@ -78,67 +72,8 @@ h1 {
   margin-bottom: 20px;
 }
 
-.search {
-  width: 100%;
-  margin-bottom: 20px;
-  padding: 8px;
-  box-sizing: border-box;
-}
-
 .users-list {
   display: grid;
   gap: 12px;
-}
-
-.user-item {
-  padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 6px;
-  background: #f9f9f9;
-}
-
-.user-name {
-  font-weight: 600;
-  color: #333;
-  margin-bottom: 4px;
-}
-
-.user-email {
-  font-size: 14px;
-  color: #666;
-  margin-bottom: 8px;
-}
-
-.user-meta {
-  display: flex;
-  gap: 8px;
-}
-
-.badge {
-  display: inline-block;
-  padding: 2px 8px;
-  background: #e3f2fd;
-  color: #1976d2;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status.active {
-  background: #e8f5e9;
-  color: #388e3c;
-}
-
-.status.inactive {
-  background: #ffebee;
-  color: #d32f2f;
 }
 </style>
