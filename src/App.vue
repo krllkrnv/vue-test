@@ -5,13 +5,21 @@
     <div v-if="isLoading">Loading...</div>
     <div v-else-if="error">{{ error }}</div>
 
-    <div v-else class="users-list">
-      <div v-for="user in users" :key="user.id" class="user-item">
-        <div class="user-name">{{ user.name }}</div>
-        <div class="user-email">{{ user.email }}</div>
-        <div class="user-meta">
-          <span class="badge">{{ user.role }}</span>
-          <span class="status" :class="user.status">{{ user.status }}</span>
+    <div v-else>
+      <input
+        v-model="query"
+        class="search"
+        type="search"
+        placeholder="Search by name"
+      >
+      <div class="users-list">
+        <div v-for="user in filteredUsers" :key="user.id" class="user-item">
+          <div class="user-name">{{ user.name }}</div>
+          <div class="user-email">{{ user.email }}</div>
+          <div class="user-meta">
+            <span class="badge">{{ user.role }}</span>
+            <span class="status" :class="user.status">{{ user.status }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -19,12 +27,25 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { fetchUsers } from './api/mock.js'
 
 const users = ref([])
 const isLoading = ref(false)
 const error = ref('')
+const query = ref('')
+
+const filteredUsers = computed(() => {
+  const normalizedQuery = query.value.trim().toLowerCase()
+
+  if (!normalizedQuery) {
+    return users.value
+  }
+
+  return users.value.filter((user) => {
+    return user.name.toLowerCase().includes(normalizedQuery)
+  })
+})
 
 onMounted(() => {
   loadUsers()
@@ -55,6 +76,13 @@ async function loadUsers() {
 h1 {
   color: #333;
   margin-bottom: 20px;
+}
+
+.search {
+  width: 100%;
+  margin-bottom: 20px;
+  padding: 8px;
+  box-sizing: border-box;
 }
 
 .users-list {
