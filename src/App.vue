@@ -1,7 +1,11 @@
 <template>
   <div class="app">
     <h1>Users</h1>
-    <div class="users-list">
+
+    <div v-if="isLoading">Loading...</div>
+    <div v-else-if="error">{{ error }}</div>
+
+    <div v-else class="users-list">
       <div v-for="user in users" :key="user.id" class="user-item">
         <div class="user-name">{{ user.name }}</div>
         <div class="user-email">{{ user.email }}</div>
@@ -19,12 +23,25 @@ import { ref, onMounted } from 'vue'
 import { fetchUsers } from './api/mock.js'
 
 const users = ref([])
+const isLoading = ref(false)
+const error = ref('')
 
 onMounted(() => {
-  fetchUsers().then((data) => {
-    users.value = data
-  })
+  loadUsers()
 })
+
+async function loadUsers() {
+  isLoading.value = true
+  error.value = ''
+
+  try {
+    users.value = await fetchUsers()
+  } catch (err) {
+    error.value = err.message
+  } finally {
+    isLoading.value = false
+  }
+}
 </script>
 
 <style scoped>
